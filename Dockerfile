@@ -27,7 +27,7 @@ COPY --from=builder /app/target/*.jar app.jar
 COPY src/main/resources/application.yaml .
 
 # Expose the port your application will run on
-EXPOSE 8080
+EXPOSE 9000
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
