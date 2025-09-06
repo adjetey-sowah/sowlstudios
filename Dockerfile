@@ -1,6 +1,9 @@
 # Use an official OpenJDK 21 runtime as the base image for the build stage
 FROM eclipse-temurin:21-jdk-jammy as builder
 
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -9,7 +12,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Build the application using Maven
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Use a smaller base image for the final stage
 FROM eclipse-temurin:21-jre-jammy

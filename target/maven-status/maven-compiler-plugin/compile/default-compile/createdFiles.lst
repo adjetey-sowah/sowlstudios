@@ -4,7 +4,6 @@ com\juls\sowlstudios\service\jwt\JwtAuthenticationEntryPoint.class
 com\juls\sowlstudios\entity\Admin.class
 com\juls\sowlstudios\config\SecurityConfig.class
 com\juls\sowlstudios\controller\BookingController.class
-com\juls\sowlstudios\service\SmsService$1.class
 com\juls\sowlstudios\service\jwt\JwtAuthenticationFilter.class
 com\juls\sowlstudios\config\PasswordEncoderConfig.class
 com\juls\sowlstudios\entity\Booking.class
@@ -22,12 +21,12 @@ com\juls\sowlstudios\dto\response\LoginResponse.class
 com\juls\sowlstudios\entity\Admin$AdminBuilder.class
 com\juls\sowlstudios\validation\PhoneValidator.class
 com\juls\sowlstudios\exception\BookingException.class
-com\juls\sowlstudios\BookingApplication.class
 com\juls\sowlstudios\exception\GlobalExceptionHandler.class
 com\juls\sowlstudios\config\AsyncConfig.class
 com\juls\sowlstudios\dto\BookingDto.class
 com\juls\sowlstudios\service\EmailService.class
 com\juls\sowlstudios\repository\AdminRepository.class
+com\juls\sowlstudios\SowlStudiosApplication.class
 com\juls\sowlstudios\controller\ApiController.class
 com\juls\sowlstudios\service\SmsService.class
 com\juls\sowlstudios\repository\BookingRepository.class
