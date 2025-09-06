@@ -49,7 +49,7 @@ public class AdminService implements UserDetailsService {
         return User.builder()
                 .username(admin.getUsername())
                 .password(admin.getPassword())
-                .authorities(new ArrayList<>())
+                .authorities(admin.getRole())
                 .build();
     }
 
@@ -88,6 +88,7 @@ public class AdminService implements UserDetailsService {
                 .email(email)
                 .fullName(fullName)
                 .isActive(true)
+                .role("ROLE_ADMIN")
                 .build();
 
         Admin savedAdmin = adminRepository.save(admin);

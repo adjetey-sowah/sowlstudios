@@ -49,6 +49,9 @@ public class Admin {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
+    @Column(name = "role")
+    private String role;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

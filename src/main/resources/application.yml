@@ -3,15 +3,15 @@ spring:
     name: photography-booking-api
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sowlstudiosdb}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:admin}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: ${SHOW_SQL:false}
+    show-sql: ${SHOW_SQL}
     properties:
         hibernate:
             dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -21,8 +21,8 @@ spring:
                 non_contextual_creation: true
 
   mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     properties:
@@ -36,7 +36,7 @@ spring:
     type: simple
 
 server:
-  port: ${SERVER_PORT:8000}
+  port: ${SERVER_PORT}
   servlet:
     context-path: /
 
@@ -59,29 +59,30 @@ management:
 # Custom application properties
 app:
   cors:
-    allowed-origins: ${FRONTEND_URL:http://localhost:3000},${FRONTEND_URL_PROD:https://your-frontend-domain.com}
+    allowed-origins: ${FRONTEND_URL},${FRONTEND_URL_PROD}
 
   jwt:
-    secret: ${JWT_SECRET:photography-booking-secret-key-that-should-be-at-least-256-bits-long}
+    secret: ${JWT_SECRET}
     expiration: ${JWT_EXPIRATION:86400000} # 24 hours
 
   admin:
     default:
-      username: ${ADMIN_USERNAME:admin}
-      password: ${ADMIN_PASSWORD:admin123}
-      email: ${ADMIN_EMAIL:support@sowlstudios.xyz}
-      fullName: ${ADMIN_FULL_NAME:System Administrator}
+      username: ${ADMIN_USERNAME}
+      password: ${ADMIN_PASSWORD}
+      phone: ${ADMIN_PHONE}
+      email: ${ADMIN_EMAIL}
+      fullName: ${ADMIN_FULL_NAME}
 
   email:
-    from: ${MAIL_USERNAME:juliusadjeteysowah@gmail.com}
-    admin: ${ADMIN_EMAIL:support@sowlstudios.xyz}
-    enabled: ${EMAIL_ENABLED:true}
+    from: ${MAIL_USERNAME}
+    admin: ${ADMIN_EMAIL}
+    enabled: ${EMAIL_ENABLED}
 
 # MNotify SMS Configuration
 mnotify:
   api:
-    key: ${MNOTIFY_API_KEY:your-mnotify-api-key}
-    url: ${MNOTIFY_API_URL:https://api.mnotify.com/api/sms/quick}
+    key: ${MNOTIFY_API_KEY}
+    url: ${MNOTIFY_API_URL}
   sender:
-    id: ${MNOTIFY_SENDER_ID:your-sender-id}
-  enabled: ${SMS_ENABLED:true}
+    id: ${MNOTIFY_SENDER_ID}
+  enabled: ${SMS_ENABLED}

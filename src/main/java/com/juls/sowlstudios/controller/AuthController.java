@@ -48,6 +48,7 @@ public class AuthController {
                     .username(admin.getUsername())
                     .email(admin.getEmail())
                     .fullName(admin.getFullName())
+                    .role(admin.getRole())
                     .build();
 
             log.info("Admin {} logged in successfully", loginRequest.getUsername());

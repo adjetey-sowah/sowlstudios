@@ -8,19 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SmsService {
-
 
     @Value("${mnotify.api.key}")
     private String apiKey;
@@ -34,6 +33,9 @@ public class SmsService {
     @Value("${mnotify.enabled:false}")
     private boolean smsEnabled;
 
+    @Value("${app.admin.default.phone}")
+    private String adminPhoneNumber;
+
     @Async
     public void sendBookingConfirmation(Booking booking) {
         if (!smsEnabled) {
@@ -42,12 +44,16 @@ public class SmsService {
         }
 
         try {
-            String message = buildBookingSmsMessage(booking);
-            sendSms(booking.getPhoneNumber(), message);
-            log.info("Booking confirmation SMS sent for booking ID: {}", booking.getId());
+            String customerMessage = buildCustomerBookingSmsMessage(booking);
+            sendSms(booking.getPhoneNumber(), customerMessage);
+            log.info("Booking confirmation SMS sent to customer for booking ID: {}", booking.getId());
+
+            String adminMessage = buildAdminNotificationSmsMessage(booking);
+            sendSms(adminPhoneNumber, adminMessage);
+            log.info("New booking notification SMS sent to admin for booking ID: {}", booking.getId());
 
         } catch (Exception e) {
-            log.error("Failed to send booking confirmation SMS for booking ID: {}", booking.getId(), e);
+            log.error("Failed to send SMS for booking ID: {}", booking.getId(), e);
         }
     }
 
@@ -58,20 +64,34 @@ public class SmsService {
         }
 
         try {
+
+            // Split the phoneNumber string into individual numbers if it contains commas
+            String[] phoneNumbers = phoneNumber.split(",");
+
+            // Format the phone numbers as a JSON array
+            String phoneNumbersJson = Arrays.stream(phoneNumbers)
+                    .map(num -> "\"" + num.trim() + "\"") // Add quotes around each number
+                    .collect(Collectors.joining(", ", "[", "]")); // Join as a JSON array
+
+
             // Prepare the request body as a JSON string
             String requestBody = String.format(
-                    "{\"recipient\":[\"%s\"], \"sender\":\"%s\", \"message\":\"%s\"}",
-                    phoneNumber, senderId, message
+                    "{\"recipient\":%s, \"sender\":\"%s\", \"message\":\"%s\", \"is_schedule\":\"false\", \"schedule_date\":\"\"}",
+                    phoneNumbersJson, // Use the formatted JSON array
+                    senderId,
+                    message
             );
+
+            log.info("Request Body: {}", requestBody);
 
             // Create the HttpClient
             HttpClient client = HttpClient.newHttpClient();
 
             // Build the request
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(apiUrl + "?key=" + apiKey)) // Append the API key to the URL
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody)) // Set the request body
-                    .header("Content-Type", "application/json") // Set the content type
+                    .uri(URI.create(apiUrl + "?key=" + apiKey))
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .header("Content-Type", "application/json")
                     .build();
 
             // Send the request
@@ -80,8 +100,10 @@ public class SmsService {
             // Log the response
             if (response.statusCode() == HttpStatus.OK.value()) {
                 log.info("SMS sent successfully to: {}", phoneNumber);
+                log.debug("API Response: {}", response.body());
             } else {
                 log.warn("SMS sending failed with status: {} for phone: {}", response.statusCode(), phoneNumber);
+                log.warn("API Response: {}", response.body());
             }
 
         } catch (Exception e) {
@@ -89,13 +111,23 @@ public class SmsService {
         }
     }
 
-
-    private String buildBookingSmsMessage(Booking booking) {
+    private String buildCustomerBookingSmsMessage(Booking booking) {
         return String.format(
-            "Hello %s! Your photography booking for %s has been received. " +
-            "We'll contact you soon to confirm details. Thank you!",
-            booking.getFirstName(),
-            booking.getGraduationDate()
+                "Hello %s! Your photography booking for %s has been received. " +
+                        "We'll contact you soon to confirm details. Thank you!",
+                booking.getFirstName(),
+                booking.getGraduationDate()
+        );
+    }
+
+    private String buildAdminNotificationSmsMessage(Booking booking) {
+        return String.format(
+                "New Booking Alert! Name: %s %s Phone: %s Package: %s Date: %s",
+                booking.getFirstName(),
+                booking.getLastName(),
+                booking.getPhoneNumber(),
+                booking.getPackagePreference(),
+                booking.getGraduationDate()
         );
     }
 }
