@@ -175,7 +175,7 @@ public class BookingService {
 
 
     private Booking convertToEntity(BookingDto dto) {
-        return Booking.builder()
+        Booking booking = Booking.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .phoneNumber(dto.getPhoneNumber())
@@ -185,5 +185,24 @@ public class BookingService {
                 .preferredLocation(dto.getPreferredLocation())
                 .additionalRequests(dto.getAdditionalRequests())
                 .build();
+
+        // Set amount based on package preference
+        if (dto.getPackagePreference() != null) {
+            switch (dto.getPackagePreference().toLowerCase()) {
+                case "basic":
+                    booking.setAmount(250.0);
+                    break;
+                case "premium":
+                    booking.setAmount(500.0);
+                    break;
+                case "deluxe":
+                    booking.setAmount(700.0);
+                    break;
+                default:
+                    booking.setAmount(0.0);
+            }
+        }
+
+        return booking;
     }
 }
