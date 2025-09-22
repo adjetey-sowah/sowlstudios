@@ -54,4 +54,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                           @Param("startDate") LocalDateTime startDate,
                                           @Param("endDate") LocalDateTime endDate,
                                           Pageable pageable);
+
+    List<Booking> findByCreatedAtBetweenAndStatus(LocalDateTime startDate, LocalDateTime endDate, Booking.BookingStatus status);
+
+    List<Booking> findByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

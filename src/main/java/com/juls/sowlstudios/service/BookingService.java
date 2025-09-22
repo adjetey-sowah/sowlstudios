@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +45,8 @@ public class BookingService {
             emailService.sendBookingConfirmation(savedBooking);
             smsService.sendBookingConfirmation(savedBooking);
 
-            log.info("Booking created successfully for: {} {} with ID: {}",
-                    savedBooking.getFirstName(), savedBooking.getLastName(), savedBooking.getId());
+            log.info("Booking created successfully for: {} {} {} with ID: {}",
+                    savedBooking.getFirstName(), savedBooking.getLastName(), savedBooking.getAmount(), savedBooking.getId());
 
             return BookingResponseDto.fromEntity(savedBooking);
         } catch (Exception e) {
@@ -82,6 +83,9 @@ public class BookingService {
 
         booking.setStatus(status);
         Booking updatedBooking = bookingRepository.save(booking);
+
+        // Send SMS notification for status update
+        smsService.sendStatusUpdateNotification(updatedBooking);
 
         log.info("Booking status updated to {} for booking ID: {}", status, id);
         return BookingResponseDto.fromEntity(updatedBooking);
@@ -144,6 +148,31 @@ public class BookingService {
         Page<Booking> bookings = bookingRepository.findBookingsWithFilters(status, startDate, endDate, pageable);
         return bookings.map(BookingResponseDto::fromEntity);
     }
+
+    @Cacheable(value = "sales", key = "#startDate + '-' + #endDate + '-' + #status")
+    public double calculateTotalSales(LocalDate startDate, LocalDate endDate, Booking.BookingStatus status) {
+        List<Booking> bookings;
+
+        if (startDate != null && endDate != null) {
+            LocalDateTime start = startDate.atStartOfDay();
+            LocalDateTime end = endDate.atTime(23, 59, 59);
+
+            if (status != null) {
+                bookings = bookingRepository.findByCreatedAtBetweenAndStatus(start, end, status);
+            } else {
+                bookings = bookingRepository.findByCreatedAtBetween(start, end);
+            }
+        } else if (status != null) {
+            bookings = bookingRepository.findByStatus(status);
+        } else {
+            bookings = bookingRepository.findAll();
+        }
+
+        return bookings.stream()
+                .mapToDouble(booking -> booking.getAmount() != null ? booking.getAmount() : 0.0)
+                .sum();
+    }
+
 
     private Booking convertToEntity(BookingDto dto) {
         return Booking.builder()

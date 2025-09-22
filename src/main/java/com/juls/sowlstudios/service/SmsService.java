@@ -57,6 +57,31 @@ public class SmsService {
         }
     }
 
+    @Async
+    public void sendStatusUpdateNotification(Booking booking) {
+        if (!smsEnabled) {
+            log.info("SMS service is disabled. Skipping status update SMS for booking ID: {}", booking.getId());
+            return;
+        }
+
+        try {
+            String message = String.format(
+                "Dear %s, your booking status has been updated to: %s. " +
+                "Package: %s, Amount: $%.2f. " +
+                "Thank you for choosing Sowl Studios!",
+                booking.getFirstName(),
+                booking.getStatus(),
+                booking.getPackagePreference(),
+                booking.getAmount()
+            );
+
+            sendSms(booking.getPhoneNumber(), message);
+            log.info("Status update SMS sent to customer for booking ID: {}", booking.getId());
+        } catch (Exception e) {
+            log.error("Failed to send status update SMS for booking ID: {}", booking.getId(), e);
+        }
+    }
+
     private void sendSms(String phoneNumber, String message) {
         if (!smsEnabled) {
             log.info("SMS service is disabled. Skipping SMS for phone: {}", phoneNumber);
@@ -113,8 +138,9 @@ public class SmsService {
 
     private String buildCustomerBookingSmsMessage(Booking booking) {
         return String.format(
-                "Hello %s! Your photography booking for %s has been received. " +
-                        "We'll contact you soon to confirm details. Thank you!",
+                "Hello %s! 🎉 We’re excited to let you know your photography booking for %s has been received. " +
+                        "We’ll be in touch soon to confirm the details. Thank you for choosing us — we can’t wait to capture your special moments!"
+                ,
                 booking.getFirstName(),
                 booking.getGraduationDate()
         );

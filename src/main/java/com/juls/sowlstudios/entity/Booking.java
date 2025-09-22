@@ -83,15 +83,38 @@ public class Booking {
     @Column(name = "status", nullable = false, length = 20)
     private BookingStatus status = BookingStatus.PENDING;
 
+    @Column(name = "amount")
+    private Double amount;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        setAmountBasedOnPackage();
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+        setAmountBasedOnPackage();
+    }
+
+    private void setAmountBasedOnPackage() {
+        if (packagePreference != null) {
+            switch (packagePreference.toLowerCase()) {
+                case "basic":
+                    this.amount = 250.0;
+                    break;
+                case "premium":
+                    this.amount = 500.0;
+                    break;
+                case "deluxe":
+                    this.amount = 700.0;
+                    break;
+                default:
+                    this.amount = 0.0;
+            }
+        }
     }
 
     public enum BookingStatus {

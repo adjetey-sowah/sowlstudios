@@ -43,4 +43,6 @@ public class BookingDto {
 
     @Size(max = 1000, message = "Additional requests cannot exceed 1000 characters")
     private String additionalRequests;
+
+    private Double amount;
 }
