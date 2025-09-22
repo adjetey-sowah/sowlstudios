@@ -13,7 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -72,5 +75,16 @@ public class AdminController {
     public ResponseEntity<ApiResponse<BookingStatsDto>> getBookingStatistics() {
         BookingStatsDto stats = bookingService.getBookingStatistics();
         return ResponseEntity.ok(ApiResponse.success("Statistics retrieved successfully", stats));
+    }
+
+    @GetMapping("/bookings/stats/sales")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getTotalSales(
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
+            @RequestParam(required = false) Booking.BookingStatus status) {
+        double totalSales = bookingService.calculateTotalSales(startDate, endDate, status);
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalSales", totalSales);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

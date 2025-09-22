@@ -113,8 +113,9 @@ public class SmsService {
 
     private String buildCustomerBookingSmsMessage(Booking booking) {
         return String.format(
-                "Hello %s! Your photography booking for %s has been received. " +
-                        "We'll contact you soon to confirm details. Thank you!",
+                "Hello %s! 🎉 We’re excited to let you know your photography booking for %s has been received. " +
+                        "We’ll be in touch soon to confirm the details. Thank you for choosing us — we can’t wait to capture your special moments!"
+                ,
                 booking.getFirstName(),
                 booking.getGraduationDate()
         );

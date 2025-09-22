@@ -40,6 +40,7 @@ public class BookingResponseDto {
     private Boolean emailSent;
     private Boolean smsSent;
     private Booking.BookingStatus status;
+    private Double amount;
 
     public static BookingResponseDto fromEntity(Booking booking) {
         return BookingResponseDto.builder()
@@ -57,6 +58,7 @@ public class BookingResponseDto {
                 .emailSent(booking.getEmailSent())
                 .smsSent(booking.getSmsSent())
                 .status(booking.getStatus())
+                .amount(booking.getAmount())
                 .build();
     }
 }
