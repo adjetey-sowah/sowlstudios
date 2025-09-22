@@ -57,6 +57,31 @@ public class SmsService {
         }
     }
 
+    @Async
+    public void sendStatusUpdateNotification(Booking booking) {
+        if (!smsEnabled) {
+            log.info("SMS service is disabled. Skipping status update SMS for booking ID: {}", booking.getId());
+            return;
+        }
+
+        try {
+            String message = String.format(
+                "Dear %s, your booking status has been updated to: %s. " +
+                "Package: %s, Amount: $%.2f. " +
+                "Thank you for choosing Sowl Studios!",
+                booking.getFirstName(),
+                booking.getStatus(),
+                booking.getPackagePreference(),
+                booking.getAmount()
+            );
+
+            sendSms(booking.getPhoneNumber(), message);
+            log.info("Status update SMS sent to customer for booking ID: {}", booking.getId());
+        } catch (Exception e) {
+            log.error("Failed to send status update SMS for booking ID: {}", booking.getId(), e);
+        }
+    }
+
     private void sendSms(String phoneNumber, String message) {
         if (!smsEnabled) {
             log.info("SMS service is disabled. Skipping SMS for phone: {}", phoneNumber);

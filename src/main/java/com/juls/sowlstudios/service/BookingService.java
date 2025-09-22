@@ -84,6 +84,9 @@ public class BookingService {
         booking.setStatus(status);
         Booking updatedBooking = bookingRepository.save(booking);
 
+        // Send SMS notification for status update
+        smsService.sendStatusUpdateNotification(updatedBooking);
+
         log.info("Booking status updated to {} for booking ID: {}", status, id);
         return BookingResponseDto.fromEntity(updatedBooking);
     }
